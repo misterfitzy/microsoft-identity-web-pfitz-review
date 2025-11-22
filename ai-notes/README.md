@@ -72,6 +72,71 @@ Comprehensive technical documentation on token management:
 
 **Use this document to**: Implement, debug, or secure token-based authentication in production systems.
 
+---
+
+## Specialized Protocol Documentation
+
+### ms-auth-notes/ - MSAuth 1.0 Protocol Deep Dive
+**Target Audience**: Protocol Engineers, Security Architects, Senior Software Engineers
+
+A comprehensive, expert-level review of the **MSAuth 1.0 AT-POP** (Access Token Proof-of-Possession) protocol implementation. This specialized documentation set provides complete conceptual and functional understanding of this advanced security protocol.
+
+#### Documentation Set:
+
+1. **[Protocol Overview](./ms-auth-notes/01-msauth10-overview.md)**
+   - Executive summary and value proposition
+   - Complete protocol architecture with detailed diagrams
+   - Core protocol elements (`token_type=pop`, `req_cnf`, `cnf` claim)
+   - 5-phase protocol flow (key generation, request, issuance, API call, validation)
+   - Security properties and threat model comparison (Bearer vs PoP)
+   - Implementation modes (SN/I vs. pinned certificate)
+   - Standards and RFC references (RFC 7800, 7517, 6749)
+
+2. **[Technical Implementation Guide](./ms-auth-notes/02-technical-implementation.md)**
+   - Complete architecture overview with component diagrams
+   - Line-by-line source code walkthrough
+   - MSAL.NET integration patterns
+   - Testing strategies (unit tests, integration tests, mocking)
+   - Troubleshooting guide with common issues
+   - Advanced topics (key rotation, custom storage)
+
+3. **[Security Architecture](./ms-auth-notes/03-security-architecture.md)**
+   - Defense-in-depth security model (7 layers)
+   - STRIDE threat analysis with MSAuth 1.0 mitigations
+   - Cryptographic foundations (RSA, ECDSA, JWT security)
+   - Attack surface analysis with residual risk assessment
+   - Security controls matrix (13+ controls)
+   - Compliance mapping (PCI DSS, HIPAA, NIST, OWASP)
+   - Security best practices and operational procedures
+
+4. **[Token Flow Diagrams and Specifications](./ms-auth-notes/04-token-flow-diagrams.md)**
+   - End-to-end protocol flow diagrams
+   - Detailed message sequence diagrams
+   - State transition diagrams (token lifecycle, client auth)
+   - Complete token structure specifications (JWT claims, JWK format)
+   - Real HTTP request/response examples
+   - Error flows with resolution strategies
+
+5. **[Integration Guide and Best Practices](./ms-auth-notes/05-integration-guide.md)**
+   - Quick start guide (5-minute integration)
+   - Step-by-step production integration
+   - Configuration patterns (Azure Key Vault, SN/I mode, multi-tenant)
+   - Best practices (security, performance, resilience)
+   - Production considerations (monitoring, health checks)
+   - Common pitfalls and solutions
+   - Migration guide (Bearer tokens → PoP tokens)
+
+**Use this documentation to**: 
+- Understand MSAuth 1.0 protocol internals for security reviews
+- Implement production-ready PoP token authentication
+- Design secure high-value applications (financial, healthcare, government)
+- Migrate from bearer tokens to proof-of-possession tokens
+- Train teams on advanced authentication protocols
+
+**See**: [ms-auth-notes/README.md](./ms-auth-notes/README.md) for complete navigation and reference guide.
+
+---
+
 ## Key Insights
 
 ### Architectural Highlights
