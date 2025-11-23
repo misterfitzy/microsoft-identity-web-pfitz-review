@@ -92,6 +92,11 @@ class Program
 
             return 1;
         }
+        finally
+        {
+            // Dispose RSA instance to prevent resource leaks
+            _popRsa?.Dispose();
+        }
     }
 
     private static void LoadConfiguration()
@@ -271,6 +276,8 @@ class Program
 
         Console.WriteLine($"Calling API: {fullUrl}");
 
+        // Note: For production applications, use HttpClientFactory or a shared HttpClient instance
+        // to avoid socket exhaustion. This pattern is acceptable for demo purposes only.
         using var httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
         httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
