@@ -140,24 +140,26 @@ if [ -n "$APP_EXISTS" ]; then
     APP_ID="$APP_EXISTS"
 else
     echo -e "${GRAY}  Creating new app registration...${NC}"
-    APP_ID=$(az ad app create --display-name "$APP_NAME" --sign-in-audience "AzureADMyOrg" --query appId -o tsv 2>&1)
+    APP_CREATE_RESULT=$(az ad app create --display-name "$APP_NAME" --sign-in-audience "AzureADMyOrg" --query appId -o tsv 2>&1)
     if [ $? -ne 0 ]; then
         echo -e "${RED}❌ Failed to create app registration${NC}"
-        echo -e "${GRAY}  Error: $APP_ID${NC}"
+        echo -e "${GRAY}  $APP_CREATE_RESULT${NC}"
         exit 1
     fi
+    APP_ID="$APP_CREATE_RESULT"
     echo -e "${GREEN}✓ App registration created${NC}"
 fi
 
 echo -e "${GRAY}  Application (Client) ID: $APP_ID${NC}"
 
 # Get the app object ID for further operations
-APP_OBJECT_ID=$(az ad app show --id "$APP_ID" --query id -o tsv 2>&1)
+APP_OBJECT_ID_RESULT=$(az ad app show --id "$APP_ID" --query id -o tsv 2>&1)
 if [ $? -ne 0 ]; then
     echo -e "${RED}❌ Failed to get app object ID${NC}"
-    echo -e "${GRAY}  Error: $APP_OBJECT_ID${NC}"
+    echo -e "${GRAY}  $APP_OBJECT_ID_RESULT${NC}"
     exit 1
 fi
+APP_OBJECT_ID="$APP_OBJECT_ID_RESULT"
 
 # Configure API permissions
 echo ""
@@ -225,7 +227,6 @@ if [ -f "$APP_SETTINGS_PATH" ]; then
             echo -e "${YELLOW}⚠️  Failed to update appsettings.json - please update manually${NC}"
         fi
     else
-        rm -f "$TMP_FILE"
         echo -e "${YELLOW}⚠️  jq not installed - please update appsettings.json manually${NC}"
         echo -e "${GRAY}  Install jq for automatic configuration: https://stedolan.github.io/jq/${NC}"
     fi
