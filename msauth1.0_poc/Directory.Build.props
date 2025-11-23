@@ -1,0 +1,6 @@
+<Project>
+  <!-- This file prevents the root Directory.Build.props from being applied to the POC app -->
+  <PropertyGroup>
+    <!-- Import nothing from parent -->
+  </PropertyGroup>
+</Project>
