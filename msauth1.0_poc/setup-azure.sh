@@ -80,19 +80,39 @@ if [ "$SKIP_CERT" != "true" ]; then
     CERT_PFX="$SCRIPT_DIR/$CERT_NAME.pfx"
     
     # Generate private key
-    openssl genrsa -out "$CERT_KEY" 2048 2>/dev/null
+    echo -e "${GRAY}  Generating RSA private key...${NC}"
+    if ! openssl genrsa -out "$CERT_KEY" 2048 >/dev/null 2>&1; then
+        echo -e "${RED}❌ Failed to generate private key${NC}"
+        exit 1
+    fi
     
     # Generate certificate signing request
-    openssl req -new -key "$CERT_KEY" -out "$CERT_CSR" -subj "/CN=$CERT_NAME" 2>/dev/null
+    echo -e "${GRAY}  Creating certificate signing request...${NC}"
+    if ! openssl req -new -key "$CERT_KEY" -out "$CERT_CSR" -subj "/CN=$CERT_NAME" >/dev/null 2>&1; then
+        echo -e "${RED}❌ Failed to generate certificate signing request${NC}"
+        exit 1
+    fi
     
     # Generate self-signed certificate (valid for 2 years)
-    openssl x509 -req -days 730 -in "$CERT_CSR" -signkey "$CERT_KEY" -out "$CERT_CRT" 2>/dev/null
+    echo -e "${GRAY}  Generating self-signed certificate...${NC}"
+    if ! openssl x509 -req -days 730 -in "$CERT_CSR" -signkey "$CERT_KEY" -out "$CERT_CRT" >/dev/null 2>&1; then
+        echo -e "${RED}❌ Failed to generate self-signed certificate${NC}"
+        exit 1
+    fi
     
     # Create PFX file (for Windows compatibility)
-    openssl pkcs12 -export -out "$CERT_PFX" -inkey "$CERT_KEY" -in "$CERT_CRT" -passout pass: 2>/dev/null
+    echo -e "${GRAY}  Creating PKCS#12 file...${NC}"
+    if ! openssl pkcs12 -export -out "$CERT_PFX" -inkey "$CERT_KEY" -in "$CERT_CRT" -passout pass: >/dev/null 2>&1; then
+        echo -e "${RED}❌ Failed to create PFX file${NC}"
+        exit 1
+    fi
     
     # Get thumbprint (SHA1 fingerprint)
-    CERT_THUMBPRINT=$(openssl x509 -in "$CERT_CRT" -noout -fingerprint -sha1 | sed 's/://g' | cut -d'=' -f2)
+    CERT_THUMBPRINT=$(openssl x509 -in "$CERT_CRT" -noout -fingerprint -sha1 2>/dev/null | sed 's/://g' | cut -d'=' -f2)
+    if [ -z "$CERT_THUMBPRINT" ]; then
+        echo -e "${RED}❌ Failed to get certificate thumbprint${NC}"
+        exit 1
+    fi
     
     echo -e "${GREEN}✓ Certificate created successfully${NC}"
     echo -e "${GRAY}  Thumbprint: $CERT_THUMBPRINT${NC}"
@@ -112,20 +132,32 @@ fi
 echo ""
 echo -e "${YELLOW}[Step 4/8] Creating app registration...${NC}"
 
-APP_EXISTS=$(az ad app list --display-name "$APP_NAME" --query "[0].appId" -o tsv)
+# Check if app already exists
+APP_EXISTS=$(az ad app list --display-name "$APP_NAME" --query "[0].appId" -o tsv 2>/dev/null || echo "")
 
 if [ -n "$APP_EXISTS" ]; then
     echo -e "${YELLOW}⚠️  App '$APP_NAME' already exists${NC}"
     APP_ID="$APP_EXISTS"
 else
-    APP_ID=$(az ad app create --display-name "$APP_NAME" --sign-in-audience "AzureADMyOrg" --query appId -o tsv)
+    echo -e "${GRAY}  Creating new app registration...${NC}"
+    APP_ID=$(az ad app create --display-name "$APP_NAME" --sign-in-audience "AzureADMyOrg" --query appId -o tsv 2>&1)
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}❌ Failed to create app registration${NC}"
+        echo -e "${GRAY}  Error: $APP_ID${NC}"
+        exit 1
+    fi
     echo -e "${GREEN}✓ App registration created${NC}"
 fi
 
 echo -e "${GRAY}  Application (Client) ID: $APP_ID${NC}"
 
 # Get the app object ID for further operations
-APP_OBJECT_ID=$(az ad app show --id "$APP_ID" --query id -o tsv)
+APP_OBJECT_ID=$(az ad app show --id "$APP_ID" --query id -o tsv 2>&1)
+if [ $? -ne 0 ]; then
+    echo -e "${RED}❌ Failed to get app object ID${NC}"
+    echo -e "${GRAY}  Error: $APP_OBJECT_ID${NC}"
+    exit 1
+fi
 
 # Configure API permissions
 echo ""
@@ -181,15 +213,19 @@ if [ -f "$APP_SETTINGS_PATH" ]; then
     
     # Use jq if available, otherwise use sed
     if command -v jq &> /dev/null; then
-        jq --arg tid "$TENANT_ID" \
+        if jq --arg tid "$TENANT_ID" \
            --arg cid "$APP_ID" \
            --arg thumb "$CERT_THUMBPRINT" \
            '.AzureAd.TenantId = $tid | .AzureAd.ClientId = $cid | (if $thumb != "" then .AzureAd.CertificateThumbprint = $thumb else . end)' \
-           "$APP_SETTINGS_PATH" > "$TMP_FILE"
-        
-        mv "$TMP_FILE" "$APP_SETTINGS_PATH"
-        echo -e "${GREEN}✓ Configuration updated successfully${NC}"
+           "$APP_SETTINGS_PATH" > "$TMP_FILE" 2>&1; then
+            mv "$TMP_FILE" "$APP_SETTINGS_PATH"
+            echo -e "${GREEN}✓ Configuration updated successfully${NC}"
+        else
+            rm -f "$TMP_FILE"
+            echo -e "${YELLOW}⚠️  Failed to update appsettings.json - please update manually${NC}"
+        fi
     else
+        rm -f "$TMP_FILE"
         echo -e "${YELLOW}⚠️  jq not installed - please update appsettings.json manually${NC}"
         echo -e "${GRAY}  Install jq for automatic configuration: https://stedolan.github.io/jq/${NC}"
     fi
