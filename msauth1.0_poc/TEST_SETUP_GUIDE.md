@@ -6,13 +6,14 @@ This guide provides complete instructions for setting up and running the MSAuth 
 
 1. [Overview](#overview)
 2. [Prerequisites](#prerequisites)
-3. [Azure AD Setup](#azure-ad-setup)
-4. [Certificate Setup](#certificate-setup)
-5. [Application Configuration](#application-configuration)
-6. [Running the Application](#running-the-application)
-7. [Understanding the Output](#understanding-the-output)
-8. [Troubleshooting](#troubleshooting)
-9. [Security Considerations](#security-considerations)
+3. [Automated Setup (Recommended)](#automated-setup-recommended)
+4. [Manual Azure AD Setup](#manual-azure-ad-setup)
+5. [Certificate Setup](#certificate-setup)
+6. [Application Configuration](#application-configuration)
+7. [Running the Application](#running-the-application)
+8. [Understanding the Output](#understanding-the-output)
+9. [Troubleshooting](#troubleshooting)
+10. [Security Considerations](#security-considerations)
 
 ---
 
@@ -45,6 +46,10 @@ This application demonstrates:
   - Download from: https://dotnet.microsoft.com/download/dotnet/8.0
   - Verify installation: `dotnet --version`
 
+- **Azure CLI** (for automated setup)
+  - Download from: https://docs.microsoft.com/en-us/cli/azure/install-azure-cli
+  - Verify installation: `az --version`
+
 - **PowerShell** (for certificate generation on Windows)
   - Windows: Built-in
   - macOS/Linux: Install PowerShell Core from https://github.com/PowerShell/PowerShell
@@ -67,7 +72,73 @@ This application demonstrates:
 
 ---
 
-## Azure AD Setup
+## Automated Setup (Recommended)
+
+The fastest way to get started is using our automated setup scripts. These scripts will handle all Azure AD configuration automatically.
+
+### Windows (PowerShell)
+
+```powershell
+# Navigate to the msauth1.0_poc folder
+cd msauth1.0_poc
+
+# Run the setup script
+.\setup-azure.ps1
+
+# Optional: Specify custom app name
+.\setup-azure.ps1 -AppName "MyCustomApp"
+
+# Optional: Skip certificate creation if you have your own
+.\setup-azure.ps1 -SkipCertificateCreation
+```
+
+### Linux/macOS (Bash)
+
+```bash
+# Navigate to the msauth1.0_poc folder
+cd msauth1.0_poc
+
+# Run the setup script
+./setup-azure.sh
+
+# Optional: Specify custom app name and certificate name
+./setup-azure.sh "MyCustomApp" "MyCertificate"
+
+# Optional: Skip certificate creation
+SKIP_CERT=true ./setup-azure.sh
+```
+
+### What the Automated Setup Does
+
+The setup script performs the following steps:
+
+1. **✓ Checks prerequisites** - Verifies Azure CLI is installed
+2. **✓ Logs in to Azure** - Opens browser for authentication
+3. **✓ Creates certificate** - Generates self-signed certificate (2048-bit RSA)
+4. **✓ Creates app registration** - Registers application in Azure AD
+5. **✓ Configures permissions** - Adds Microsoft Graph User.Read.All permission
+6. **✓ Grants admin consent** - Automatically grants consent (if you have permissions)
+7. **✓ Uploads certificate** - Adds certificate to app registration
+8. **✓ Updates configuration** - Automatically updates appsettings.json
+
+### After Automated Setup
+
+Once the script completes, you'll see a summary with:
+- Tenant ID
+- Application (Client) ID
+- Certificate Thumbprint
+- Links to verify in Azure Portal
+
+Simply run the application:
+
+```bash
+cd MSAuth10PocApp
+dotnet run
+```
+
+---
+
+## Manual Azure AD Setup
 
 ### Step 1: Register the Application
 

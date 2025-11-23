@@ -10,11 +10,54 @@ msauth1.0_poc/
 │   ├── Program.cs               # Main application code
 │   ├── MSAuth10PocApp.csproj   # Project file
 │   └── appsettings.json        # Configuration template
+├── setup-azure.ps1              # Automated setup script (Windows)
+├── setup-azure.sh               # Automated setup script (Linux/macOS)
 ├── TEST_SETUP_GUIDE.md         # Comprehensive setup guide
 └── README.md                   # This file
 ```
 
 ## Quick Start
+
+### Option A: Automated Setup (Recommended) 🚀
+
+The easiest way to get started is using our automated setup scripts that handle Azure AD configuration for you.
+
+#### Windows (PowerShell)
+
+```powershell
+# Run from the msauth1.0_poc folder
+.\setup-azure.ps1
+```
+
+#### Linux/macOS (Bash)
+
+```bash
+# Run from the msauth1.0_poc folder
+./setup-azure.sh
+```
+
+**What the scripts do:**
+- ✅ Login to your Azure tenant
+- ✅ Create app registration in Azure AD
+- ✅ Configure Microsoft Graph API permissions
+- ✅ Generate self-signed certificate
+- ✅ Upload certificate to app registration
+- ✅ Grant admin consent
+- ✅ Update appsettings.json with your configuration
+
+**Requirements:**
+- Azure CLI installed ([Download](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli))
+- Admin access to Azure AD tenant
+- PowerShell 5.1+ (Windows) or Bash (Linux/macOS)
+- OpenSSL (for Linux/macOS certificate generation)
+
+After the script completes, simply run:
+```bash
+cd MSAuth10PocApp
+dotnet run
+```
+
+### Option B: Manual Setup
 
 ### 1. Prerequisites
 - .NET 8.0 SDK or later
