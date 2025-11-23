@@ -69,7 +69,8 @@ Both scripts perform the following operations:
    - Checks for OpenSSL (Linux/macOS) or PowerShell cmdlets (Windows)
 
 2. **Azure Login**
-   - Initiates browser-based Azure CLI login
+   - Checks if already logged in to Azure CLI
+   - If not logged in, initiates browser-based Azure CLI login
    - Displays tenant information
 
 3. **Certificate Generation** (unless skipped)
