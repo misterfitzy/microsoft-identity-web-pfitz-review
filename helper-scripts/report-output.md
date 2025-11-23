@@ -29,7 +29,20 @@ The script executed without throwing an error (exit code 0), but the remote reso
 2. Network restrictions prevent access to this domain
 3. The domain requires specific DNS settings not available in this environment
 
-To proceed with this script, you may need to:
-- Verify the correct URL for the linenum script
-- Ensure network access to the required domain
-- Or provide an alternative local version of the script
+## Security Considerations
+
+⚠️ **Important Security Warning**: The command `curl -sL linenum.sh | bash` downloads and executes arbitrary code from the internet without any verification. This pattern poses significant security risks:
+
+- No verification of the script's contents or integrity
+- No way to inspect what code will be executed before it runs
+- Potential for malicious code execution if the domain is compromised
+- No protection against man-in-the-middle attacks (not using HTTPS verification)
+
+## Recommendations
+
+To proceed more securely with this script, consider:
+- First download the script and inspect its contents before execution
+- Verify the script's integrity using checksums or signatures
+- Use HTTPS and verify certificates
+- Host the script locally after review rather than executing remote code directly
+- If the script must be executed remotely, ensure the source is trusted and the connection is secure
