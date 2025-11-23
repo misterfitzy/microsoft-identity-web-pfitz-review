@@ -12,19 +12,14 @@ The script was executed successfully, but produced no output.
 
 ### Issue Encountered
 
-The command `curl -sL linenum.sh | bash` attempts to download and execute a script from the domain `linenum.sh`. However, DNS resolution failed for this domain:
-
-```
-* Could not resolve host: linenum.sh
-* Closing connection
-curl: (6) Could not resolve host: linenum.sh
-```
+The command `curl -sL linenum.sh | bash` attempts to download and execute a script from the domain `linenum.sh`. However, DNS resolution failed for this domain. The script uses silent mode (`-s` flag), so no error messages are displayed, but the curl command fails with exit code 6 (Could not resolve host) when run in isolation.
 
 ### Exit Status
 
-- **Exit Code**: 0 (Success)
+- **Exit Code**: 0 (Success - due to bash pipeline behavior)
 - **Output**: None (empty)
-- **Error**: DNS resolution failure for linenum.sh
+- **Error**: DNS resolution failure for linenum.sh (silent, not displayed)
+- **Note**: The pipeline exits with 0 because bash receives empty input and completes successfully, even though curl fails
 
 ## Summary
 
