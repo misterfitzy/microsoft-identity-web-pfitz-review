@@ -30,21 +30,29 @@ try {
     exit 1
 }
 
-# Login to Azure
+# Check Azure login status
 Write-Host ""
-Write-Host "[Step 2/8] Logging in to Azure..." -ForegroundColor Yellow
-Write-Host "A browser window will open for authentication." -ForegroundColor Gray
+Write-Host "[Step 2/8] Checking Azure login status..." -ForegroundColor Yellow
 
-$loginResult = az login --allow-no-subscriptions 2>&1
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "❌ Failed to login to Azure" -ForegroundColor Red
-    exit 1
+# Try to get account info to check if already logged in
+$accountCheckResult = az account show 2>&1
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "✓ Already logged in to Azure" -ForegroundColor Green
+    $account = $accountCheckResult | ConvertFrom-Json
+} else {
+    Write-Host "Not currently logged in. A browser window will open for authentication." -ForegroundColor Gray
+    $loginResult = az login --allow-no-subscriptions 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "❌ Failed to login to Azure" -ForegroundColor Red
+        exit 1
+    }
+    Write-Host "✓ Successfully logged in to Azure" -ForegroundColor Green
+    # Get account info after successful login
+    $accountCheckResult = az account show 2>&1
+    $account = $accountCheckResult | ConvertFrom-Json
 }
 
-Write-Host "✓ Successfully logged in to Azure" -ForegroundColor Green
-
 # Get tenant information
-$account = az account show | ConvertFrom-Json
 $tenantId = $account.homeTenantId
 $tenantName = $account.name
 

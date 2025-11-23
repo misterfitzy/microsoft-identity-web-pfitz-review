@@ -43,17 +43,21 @@ if [ "$SKIP_CERT" != "true" ]; then
     echo -e "${GREEN}✓ OpenSSL is installed${NC}"
 fi
 
-# Login to Azure
+# Check Azure login status
 echo ""
-echo -e "${YELLOW}[Step 2/8] Logging in to Azure...${NC}"
-echo -e "${GRAY}A browser window will open for authentication.${NC}"
+echo -e "${YELLOW}[Step 2/8] Checking Azure login status...${NC}"
 
-if ! az login --allow-no-subscriptions > /dev/null 2>&1; then
-    echo -e "${RED}❌ Failed to login to Azure${NC}"
-    exit 1
+# Try to get account info to check if already logged in
+if az account show > /dev/null 2>&1; then
+    echo -e "${GREEN}✓ Already logged in to Azure${NC}"
+else
+    echo -e "${GRAY}Not currently logged in. A browser window will open for authentication.${NC}"
+    if ! az login --allow-no-subscriptions > /dev/null 2>&1; then
+        echo -e "${RED}❌ Failed to login to Azure${NC}"
+        exit 1
+    fi
+    echo -e "${GREEN}✓ Successfully logged in to Azure${NC}"
 fi
-
-echo -e "${GREEN}✓ Successfully logged in to Azure${NC}"
 
 # Get tenant information
 TENANT_ID=$(az account show --query homeTenantId -o tsv)
