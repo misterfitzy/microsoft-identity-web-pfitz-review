@@ -47,7 +47,9 @@ if ($LASTEXITCODE -eq 0) {
         exit 1
     }
     Write-Host "✓ Successfully logged in to Azure" -ForegroundColor Green
-    $account = az account show | ConvertFrom-Json
+    # Get account info after successful login
+    $accountCheckResult = az account show 2>&1
+    $account = $accountCheckResult | ConvertFrom-Json
 }
 
 # Get tenant information
