@@ -133,7 +133,19 @@ echo ""
 echo -e "${YELLOW}[Step 4/8] Creating app registration...${NC}"
 
 # Check if app already exists
-APP_EXISTS=$(az ad app list --display-name "$APP_NAME" --query "[0].appId" -o tsv 2>/dev/null || echo "")
+APP_LIST_RESULT=$(az ad app list --display-name "$APP_NAME" --query "[0].appId" -o tsv 2>&1)
+APP_LIST_EXIT=$?
+if [ $APP_LIST_EXIT -ne 0 ]; then
+    # Check if this is a real error (not just "no apps found")
+    if echo "$APP_LIST_RESULT" | grep -qi "error\|ERROR\|unauthorized\|forbidden"; then
+        echo -e "${RED}❌ Failed to list apps: $APP_LIST_RESULT${NC}"
+        exit 1
+    fi
+    # Otherwise treat as "no apps found"
+    APP_EXISTS=""
+else
+    APP_EXISTS="$APP_LIST_RESULT"
+fi
 
 if [ -n "$APP_EXISTS" ]; then
     echo -e "${YELLOW}⚠️  App '$APP_NAME' already exists${NC}"
