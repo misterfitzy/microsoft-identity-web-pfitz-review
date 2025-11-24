@@ -201,7 +201,7 @@ var handler = new JwtSecurityTokenHandler();
 try
 {
     var principal = handler.ValidateToken(token, validationParameters, out var validatedToken);
-    // Token is cryptographically verified
+    // Token is cryptographically verified using RSA signature
 }
 catch (SecurityTokenException)
 {
@@ -209,8 +209,6 @@ catch (SecurityTokenException)
     throw;
 }
 ```
-
-**Note**: JWT signature uses RSA-PKCS1-v1_5 with SHA-256, not HMAC.
 
 ### 2.3 Repudiation
 
