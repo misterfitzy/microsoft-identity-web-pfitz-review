@@ -10,6 +10,25 @@ MSAuth 1.0 AT-POP enhances OAuth 2.0 security by cryptographically binding acces
 
 ## Documentation Structure
 
+### 0. [Executive Summary and Quick Reference](./00-executive-summary.md) 🆕⭐
+
+**Target Audience:** Executives, managers, decision makers, time-constrained engineers
+
+**Contents:**
+- 60-second protocol overview
+- Technical summary table
+- Security comparison (Bearer vs. PoP)
+- Simplified protocol flow
+- Production deployment checklist
+- Common issues and solutions
+- When to use (decision matrix)
+- Quick reference metrics
+- Final recommendations
+
+**Key Takeaway:** Fast understanding for decision-making and quick reference
+
+---
+
 ### 1. [Protocol Overview](./01-msauth10-overview.md)
 
 **Target Audience:** Architects, security engineers, protocol engineers
@@ -125,6 +144,72 @@ MSAuth 1.0 AT-POP enhances OAuth 2.0 security by cryptographically binding acces
 - Migration guide (Bearer → PoP tokens)
 
 **Key Takeaway:** Practical, production-ready implementation patterns
+
+---
+
+### 6. [Protocol Deep Dive: Advanced Analysis](./06-protocol-deep-dive.md) 🆕
+
+**Target Audience:** Protocol engineers, security architects, senior technical staff
+
+**Contents:**
+- Protocol taxonomy and classification
+- Wire format and message structure analysis
+- The `req_cnf` parameter technical deep dive
+- Token structure and cryptographic binding
+- Protocol state machine and lifecycle
+- Security analysis (cryptographic strength, attack surfaces)
+- Implementation considerations and best practices
+- Protocol comparison and standards alignment (RFC 7800, RFC 7517)
+- Advanced topics and edge cases
+- Operational insights and troubleshooting
+
+**Key Takeaway:** Deep technical understanding of protocol internals and design decisions
+
+---
+
+### 7. [Code Analysis and Implementation Patterns](./07-code-analysis-and-implementation-patterns.md) 🆕
+
+**Target Audience:** Software engineers, code reviewers, architects
+
+**Contents:**
+- Architecture and code organization
+- Complete source code analysis
+  - `MsAuth10AtPop.cs` line-by-line analysis
+  - `AtPopOperation.cs` implementation details
+  - `TokenAcquisition.cs` integration patterns
+- Proof-of-concept application walkthrough
+- Unit test analysis and coverage
+- Design patterns used (Extension Method, Strategy, Builder, etc.)
+- Code quality observations and recommendations
+- Security analysis of implementation
+- Production code templates
+- Performance optimization strategies
+
+**Key Takeaway:** Comprehensive understanding of implementation details and code quality
+
+---
+
+### 8. [Security Operations Guide](./08-security-operations-guide.md) 🆕
+
+**Target Audience:** Security engineers, SOC analysts, compliance officers
+
+**Contents:**
+- Security model and trust boundaries
+- Comprehensive threat analysis (STRIDE with mitigations)
+- Cryptographic security analysis
+  - Algorithm strength and key sizes
+  - Quantum computing threat assessment
+  - Side-channel attack resistance
+- Operational security controls
+  - Key lifecycle management
+  - Monitoring and alerting
+  - Incident response playbooks
+- Compliance and audit requirements
+- Penetration testing checklist
+- Defense in depth strategy
+- Security maturity model
+
+**Key Takeaway:** Complete operational security framework for production deployments
 
 ---
 
