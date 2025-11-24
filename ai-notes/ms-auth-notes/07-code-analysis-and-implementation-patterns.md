@@ -715,10 +715,10 @@ public void GetTokenRequestParams_ReturnsCorrectDictionary()
 
 #### Potential Improvements
 
-1. **Lack of Public Documentation**
+1. **Internal Documentation**
    - Internal classes have minimal XML comments
-   - No public API documentation
-   - Consider adding detailed comments for maintainers
+   - While not public API, detailed comments would help maintainers
+   - Consider adding implementation notes for future developers
 
 2. **No Runtime Validation of JWK**
    - `jwkClaim` accepted as-is
@@ -851,7 +851,7 @@ public class PopTokenService
         // Validate JWK is well-formed JSON
         try
         {
-            var parsed = JsonDocument.Parse(jwk);
+            using var parsed = JsonDocument.Parse(jwk);
             // Validate required fields exist
             if (!parsed.RootElement.TryGetProperty("kty", out _) ||
                 !parsed.RootElement.TryGetProperty("n", out _) ||

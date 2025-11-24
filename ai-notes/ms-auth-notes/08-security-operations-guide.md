@@ -142,7 +142,7 @@ Likelihood: Low (if properly secured)
 **Security Control Implementation**:
 ```csharp
 // Azure Key Vault with Managed Identity
-var keyVaultUri = new Uri("https://myvault.vault.azure.net");
+var keyVaultUri = new Uri(_configuration["KeyVault:Uri"]); // From configuration
 var credential = new DefaultAzureCredential();
 var keyClient = new KeyClient(keyVaultUri, credential);
 
@@ -175,7 +175,7 @@ Likelihood: Zero (cryptographically impossible without Azure AD's private key)
 // Token structure
 Header:    { "alg": "RS256", "typ": "JWT", "kid": "azure-key-1" }
 Payload:   { "cnf": { "jwk": { ... } }, "aud": "...", ... }
-Signature: HMACSHA256(base64(header) + "." + base64(payload), AzureAD_PrivateKey)
+Signature: RSASHA256(base64url(header) + "." + base64url(payload), AzureAD_PrivateKey)
 
 // Any modification to cnf invalidates signature
 Original cnf:  { "jwk": { "kid": "legitimate-key" } }
@@ -209,6 +209,8 @@ catch (SecurityTokenException)
     throw;
 }
 ```
+
+**Note**: JWT signature uses RSA-PKCS1-v1_5 with SHA-256, not HMAC.
 
 ### 2.3 Repudiation
 
@@ -795,10 +797,10 @@ public class SecurityMonitoring
 IMMEDIATE ACTIONS (< 5 minutes)
 ───────────────────────────────────
 1. Disable compromised key in Key Vault
-   Command: az keyvault key set-attributes --enabled false --vault-name {vault} --name {key}
+   Command: az keyvault key set-attributes --enabled false --vault-name <vault-name> --name <key-name>
 
 2. Generate new key pair
-   Command: az keyvault key create --vault-name {vault} --name {new-key} --protection hsm
+   Command: az keyvault key create --vault-name <vault-name> --name <new-key-name> --protection hsm
 
 3. Update application configuration to use new key
    Deploy: Update PopPublicKey and PopClaim in app configuration
